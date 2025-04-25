@@ -518,6 +518,7 @@ defmodule LangChain.Chains.LLMChain do
     try do
       case run_fn.(use_chain) do
         {:ok, result} ->
+          Logger.warning("LLM succeeded with fallback: llm=#{inspect llm}")
           {:ok, result}
 
         {:error, _error_chain, reason} ->
