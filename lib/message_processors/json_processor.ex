@@ -131,6 +131,7 @@ defmodule LangChain.MessageProcessors.JsonProcessor do
           {:cont, %Message{message | processed_content: parsed}}
 
         {:error, %Jason.DecodeError{} = error} ->
+          IO.puts("failed to parse json, INVALID json - message=#{inspect message.processed_content}")
           error_message = Jason.DecodeError.message(error)
           {:halt, Message.new_user!("ERROR: Invalid JSON data: #{error_message}")}
       end
