@@ -404,7 +404,7 @@ defmodule LangChain.Chains.LLMChain do
 
   **Use Case**: A chat with an LLM where functions are available to the LLM:
 
-      LLMChain.run(chain, mode: :while_needs_response)
+    LLMChain.run(chain, mode: :while_needs_response)
 
   This will execute any LLM called functions, returning the result to the LLM,
   and giving it a chance to respond to the results.
@@ -515,6 +515,7 @@ defmodule LangChain.Chains.LLMChain do
         use_chain
       end
 
+    Logger.debug("llm_chain.try_chain_with_llm: before running chain, chain=#{inspect chain, pretty: true}")
     try do
       case run_fn.(use_chain) do
         {:ok, result} ->
@@ -596,12 +597,15 @@ defmodule LangChain.Chains.LLMChain do
   # opportunity to execute more tools or return a response.
   @spec run_while_needs_response(t()) :: {:ok, t()} | {:error, t(), LangChainError.t()}
   defp run_while_needs_response(%LLMChain{needs_response: false} = chain) do
+    Logger.debug("run_while_needs_response: needs response false")
     {:ok, chain}
   end
 
   defp run_while_needs_response(%LLMChain{needs_response: true} = chain) do
+    Logger.debug("run_while_needs_response: needs response true")
     chain
     |> execute_tool_calls()
+    |> IO.inspect(label: "after execute_tool_calls")
     |> do_run()
     |> case do
       {:ok, updated_chain} ->
