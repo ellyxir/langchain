@@ -941,6 +941,7 @@ defmodule LangChain.Chains.LLMChain do
     Logger.debug("llm_chain.process_message, calling run_message_processors")
     case run_message_processors(chain, message) do
       {:halted, failed_message, new_message} ->
+        Logger.debug("llm_chain.process_message: halted")
         if chain.verbose do
           IO.inspect(failed_message, label: "PROCESSOR FAILED ON MESSAGE")
           IO.inspect(new_message, label: "PROCESSOR FAILURE RESPONSE MESSAGE")
@@ -956,6 +957,7 @@ defmodule LangChain.Chains.LLMChain do
         |> fire_callback_and_return(:on_error_message_created, [new_message])
 
       %Message{role: :assistant} = updated_message ->
+        Logger.debug("llm_chain.process_message: updated_message")
         if chain.verbose, do: IO.inspect(updated_message, label: "MESSAGE PROCESSED")
 
         chain
@@ -964,6 +966,7 @@ defmodule LangChain.Chains.LLMChain do
         |> fire_callback_and_return(:on_message_processed, [updated_message])
         |> fire_usage_callback_and_return(:on_llm_token_usage, [updated_message])
     end
+    |> IO.inspect(label: "RETURN FROM process_message")
   end
 
   @doc """
