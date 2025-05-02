@@ -897,10 +897,12 @@ defmodule LangChain.Chains.LLMChain do
       )
       when is_list(processors) and processors != [] do
     # start `processed_content` with the message's content as a string
+    Logger.debug("llmchain.run_message_processors")
     message = %Message{message | processed_content: ContentPart.parts_to_string(message.content)}
 
     processors
     |> Enum.reduce_while(message, fn proc, m = _acc ->
+      Logger.debug("llmchain.run_message_processors. starting processor")
       try do
         case proc.(chain, m) do
           {:cont, updated_msg} ->
@@ -936,6 +938,7 @@ defmodule LangChain.Chains.LLMChain do
   """
   @spec process_message(t(), Message.t()) :: t()
   def process_message(%LLMChain{} = chain, %Message{} = message) do
+    Logger.debug("llm_chain.process_message, calling run_message_processors")
     case run_message_processors(chain, message) do
       {:halted, failed_message, new_message} ->
         if chain.verbose do
